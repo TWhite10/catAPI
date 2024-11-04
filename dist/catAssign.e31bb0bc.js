@@ -12299,7 +12299,45 @@ function _initialLoad() {
             option.textContent = breed.name;
             breedSelect.appendChild(option);
           });
-        case 7:
+
+          //part two
+          breedSelect.addEventListener("change", function (event) {
+            var selectedBreedId = event.target.value;
+            var carousel = document.getElementById("carouselInner");
+            carousel.innerHTML = "";
+            infoDump.innerHTML = "";
+            var selectedBreed = jsonData.find(function (breed) {
+              return breed.id === selectedBreedId;
+            });
+            console.log("Selected breed:", selectedBreed);
+            if (selectedBreed) {
+              infoDump.innerHTML = "\n                    <h3>".concat(selectedBreed.name, "</h3>\n                    <p>").concat(selectedBreed.description, "</p>\n                    <p><strong>Temperament:</strong> ").concat(selectedBreed.temperament, "</p>\n                    <p><strong>Origin:</strong> ").concat(selectedBreed.origin, "</p>\n                    <p><strong>Weight:</strong> ").concat(selectedBreed.weight, " kg</p>\n                    <p><strong>Life Span:</strong> ").concat(selectedBreed.life_span, " years</p>\n                ");
+            }
+            ;
+            fetch("https://api.thecatapi.com/v1/images/search?breed_ids=".concat(selectedBreedId, "&limit=10")).then(function (response) {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return response.json();
+            }).then(function (data) {
+              data.forEach(function (imageData, index) {
+                var carouselItem = document.createElement("div");
+                carouselItem.className = "carousel-item";
+                if (index === 0) {
+                  carouselItem.classList.add("active");
+                }
+                var img = document.createElement("img");
+                img.src = imageData.url;
+                img.className = "d-block w-100 ";
+                carouselItem.appendChild(img);
+                carousel.appendChild(carouselItem);
+              });
+            }).catch(function (error) {
+              console.error("There was a problem:", error);
+              infoDump.innerHTML = "<p>Error loading cat information</p>";
+            });
+          });
+        case 8:
         case "end":
           return _context.stop();
       }
@@ -12431,7 +12469,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52883" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49819" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
