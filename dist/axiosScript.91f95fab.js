@@ -12471,6 +12471,7 @@ var getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
 var API_KEY = "live_OBDjG8qEZoYQmlIbzIr1QlQKJwcKigRRd4QneSkNdhpO9Nf4haxFN0AIBsnWh1Gf";
+_axios.default.defaults.headers.common['x-api-key'] = API_KEY;
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
@@ -12485,20 +12486,44 @@ var API_KEY = "live_OBDjG8qEZoYQmlIbzIr1QlQKJwcKigRRd4QneSkNdhpO9Nf4haxFN0AIBsnW
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
+function buildCarouselItems(imageDataArray, CarouselElement) {
+  CarouselElement.innerHTML = "";
+  imageDataArray.forEach(function (imageData, index) {
+    var carouselItem = document.createElement("div");
+    carouselItem.className = "carousel-item";
+
+    // if(response.data.length === 0){
+    //     const noFavouriteImg = "catAssign/img/image.png";
+    //     buildCarouselItems([ {url:noFavouriteImg}],carousel);
+    // }
+
+    if (index === 0) {
+      carouselItem.classList.add("active");
+    }
+    var img = document.createElement("img");
+    //image for when there is no cat image this is not working 
+    //const noImg = "catAssign/img/image.png";
+    img.src = imageData.url;
+    //|| noImg;
+    img.className = "d-block w-100 ";
+    carouselItem.appendChild(img);
+    CarouselElement.appendChild(carouselItem);
+  });
+}
 function initialLoad() {
   return _initialLoad.apply(this, arguments);
 }
 function _initialLoad() {
-  _initialLoad = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+  _initialLoad = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
     var response, breeds;
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) switch (_context.prev = _context.next) {
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
         case 0:
-          _context.prev = 0;
-          _context.next = 3;
+          _context2.prev = 0;
+          _context2.next = 3;
           return _axios.default.get("https://api.thecatapi.com/v1/breeds");
         case 3:
-          response = _context.sent;
+          response = _context2.sent;
           breeds = response.data;
           breeds.forEach(function (breed) {
             var option = document.createElement("option");
@@ -12523,18 +12548,7 @@ function _initialLoad() {
             progressBar.style.width = '100%';
             _axios.default.get("https://api.thecatapi.com/v1/images/search?breed_ids=".concat(selectedBreedId, "&limit=10")).then(function (response) {
               var data = response.data;
-              data.forEach(function (imageData, index) {
-                var carouselItem = document.createElement("div");
-                carouselItem.className = "carousel-item";
-                if (index === 0) {
-                  carouselItem.classList.add("active");
-                }
-                var img = document.createElement("img");
-                img.src = imageData.url;
-                img.className = "d-block w-100 ";
-                carouselItem.appendChild(img);
-                carousel.appendChild(carouselItem);
-              });
+              buildCarouselItems(data, carousel);
             });
             _axios.default.get("https://api.thecatapi.com/v1/breeds/".concat(selectedBreedId)).then(function (response) {
               var breed = response.data;
@@ -12546,18 +12560,18 @@ function _initialLoad() {
             progressBar.style.width = "0%";
           });
           console.log(response);
-          _context.next = 14;
+          _context2.next = 14;
           break;
         case 10:
-          _context.prev = 10;
-          _context.t0 = _context["catch"](0);
-          console.error(_context.t0);
+          _context2.prev = 10;
+          _context2.t0 = _context2["catch"](0);
+          console.error(_context2.t0);
           progressBar.style.width = "0%";
         case 14:
         case "end":
-          return _context.stop();
+          return _context2.stop();
       }
-    }, _callee, null, [[0, 10]]);
+    }, _callee2, null, [[0, 10]]);
   }));
   return _initialLoad.apply(this, arguments);
 }
@@ -12625,6 +12639,87 @@ function favourite(_x) {
  *    If that isn't in its own function, maybe it should be so you don't have to
  *    repeat yourself in this section.
  */
+function _favourite() {
+  _favourite = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(imgId) {
+    var responseFav, ifImgExist;
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.prev = 0;
+          _context3.next = 3;
+          return _axios.default.get("https://api.thecatapi.com/v1/favourites/");
+        case 3:
+          responseFav = _context3.sent;
+          console.log(responseFav);
+          //check if the image already exist 
+          ifImgExist = responseFav.data.find(function (r) {
+            return r.image_id === imgId;
+          });
+          if (!ifImgExist) {
+            _context3.next = 12;
+            break;
+          }
+          _context3.next = 9;
+          return _axios.default.delete("https://api.thecatapi.com/v1/favourites/".concat(ifImgExist.id));
+        case 9:
+          console.log("Deleted post with ID ".concat(ifImgExist.id));
+          _context3.next = 15;
+          break;
+        case 12:
+          _context3.next = 14;
+          return _axios.default.post("https://api.thecatapi.com/v1/favourites", {
+            "image_id": imgId,
+            "sub_id": "optional unique id of your user"
+          });
+        case 14:
+          console.log("Deleted post with ID ".concat(ifImgExist.id));
+        case 15:
+          _context3.next = 20;
+          break;
+        case 17:
+          _context3.prev = 17;
+          _context3.t0 = _context3["catch"](0);
+          console.error("Error :", _context3.t0);
+        case 20:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3, null, [[0, 17]]);
+  }));
+  return _favourite.apply(this, arguments);
+}
+getFavouritesBtn.addEventListener("click", /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+  var carousel, response, noFavouriteImg, favouriteImgs;
+  return _regeneratorRuntime().wrap(function _callee$(_context) {
+    while (1) switch (_context.prev = _context.next) {
+      case 0:
+        carousel = document.getElementById("carouselInner");
+        _context.next = 3;
+        return _axios.default.get("https://api.thecatapi.com/v1/favourites/");
+      case 3:
+        response = _context.sent;
+        if (response.data.length === 0) {
+          noFavouriteImg = "catAssign/img/image.png";
+          buildCarouselItems([{
+            url: noFavouriteImg
+          }], carousel);
+        }
+        favouriteImgs = response.data.map(function (favourite) {
+          return {
+            url: favourite.image.url
+          };
+        });
+        buildCarouselItems(favouriteImgs, carousel);
+        (function (error) {
+          console.error("Error :", error);
+        });
+      case 8:
+      case "end":
+        return _context.stop();
+    }
+  }, _callee);
+})));
+
 /**
  * 10. Test your site, thoroughly!
  * - What happens when you try to load the Malayan breed?
@@ -12632,18 +12727,13 @@ function favourite(_x) {
  * - Test other breeds as well. Not every breed has the same data available, so
  *   your code should account for this.
  */
-function _favourite() {
-  _favourite = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(imgId) {
-    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-      while (1) switch (_context2.prev = _context2.next) {
-        case 0:
-        case "end":
-          return _context2.stop();
-      }
-    }, _callee2);
-  }));
-  return _favourite.apply(this, arguments);
-}
+
+//create array to post favourite list 
+// press button you will see all fav
+//display go by the src which is a link to that picture 
+//the response from the api is an empty array, you need to add the logic 
+//fetch api if it is empty array, if the cat selected has no picture you create a picture that will go that is a dummy img display to the use that the images are not available 
+//dummy images - put the link put the img from imgs folder
 },{"./Carousel.js":"Carousel.js","axios":"node_modules/axios/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -12669,7 +12759,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49819" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57320" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
